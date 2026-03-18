@@ -1,0 +1,14 @@
+## Interface: 110105
+## Title: BagCleaner
+## Notes: Configurable inventory decluttering - auto-sell junk and mark items for disenchanting
+## Notes-deDE: Konfigurierbares Inventar-Aufräumen - automatisch Schrott verkaufen und Items zum Entzaubern markieren
+## Author: MatthiasHertel80
+## Version: 1.0.0
+## SavedVariables: BagCleanerDB
+
+Core.lua
+Locales.lua
+Rules.lua
+AutoSell.lua
+Disenchant.lua
+UI.lua

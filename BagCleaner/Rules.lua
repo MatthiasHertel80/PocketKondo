@@ -1,0 +1,99 @@
+local addonName, ns = ...
+local Rules = ns.Rules
+
+-- Check if an item should be sold at a vendor
+function Rules:ShouldSell(item)
+    if not item then return false end
+
+    local db = ns.db
+
+    -- Keep list always wins
+    if db.keepList[item.itemID] then
+        return false
+    end
+
+    -- Explicit sell list
+    if db.sellList[item.itemID] then
+        return true
+    end
+
+    -- Items with no vendor value cannot be sold
+    if item.hasNoValue or (item.sellPrice and item.sellPrice == 0) then
+        return false
+    end
+
+    -- Quality-based rules
+    if db.sellPoor and item.quality == 0 then
+        return true
+    end
+    if db.sellCommon and item.quality == 1 then
+        return true
+    end
+    if db.sellUncommon and item.quality == 2 then
+        return true
+    end
+
+    -- Item level threshold for equipment
+    if db.sellBelowIlvl > 0 and item.itemLevel and item.classID then
+        local isEquipment = (item.classID == 2) or (item.classID == 4) -- Weapon or Armor
+        if isEquipment and item.itemLevel < db.sellBelowIlvl then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Check if an item should be marked for disenchanting
+function Rules:ShouldMarkDE(item)
+    if not item then return false end
+
+    local db = ns.db
+
+    -- Keep list always wins
+    if db.keepList[item.itemID] then
+        return false
+    end
+
+    -- Must be equipment (Weapon=2 or Armor=4)
+    if not item.classID then return false end
+    if item.classID ~= 2 and item.classID ~= 4 then
+        return false
+    end
+
+    -- Quality must be in the configured range
+    if not item.quality then return false end
+    if item.quality < db.deMinQuality or item.quality > db.deMaxQuality then
+        return false
+    end
+
+    -- Item level threshold
+    if db.deBelowIlvl > 0 and item.itemLevel then
+        if item.itemLevel >= db.deBelowIlvl then
+            return false
+        end
+    end
+
+    return true
+end
+
+-- List management
+function Rules:AddToKeepList(itemID, itemName)
+    ns.db.keepList[itemID] = itemName or true
+    -- Remove from sell list if present
+    ns.db.sellList[itemID] = nil
+end
+
+function Rules:RemoveFromKeepList(itemID)
+    ns.db.keepList[itemID] = nil
+end
+
+function Rules:AddToSellList(itemID, itemName)
+    ns.db.sellList[itemID] = itemName or true
+    -- Remove from keep list if present
+    ns.db.keepList[itemID] = nil
+end
+
+function Rules:RemoveFromSellList(itemID)
+    ns.db.sellList[itemID] = nil
+end
