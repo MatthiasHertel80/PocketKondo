@@ -17,6 +17,11 @@ local L = {
     SELL_BELOW_ILVL = "Sell gear below ilvl: ",
     SOLD_SUMMARY = "Tidied up! Sold %d joyless item(s) for %s.",
     SOLD_NOTHING = "Your bags already spark joy!",
+    CONFIRM_SELL_HEADER = "Sell %d item(s) for %s?",
+    CONFIRM_SELL_BTN = "Sell",
+    CONFIRM_TOTAL = "Total",
+    MINIMAP_TOOLTIP_LEFT = "Left-click: Open settings",
+    MINIMAP_TOOLTIP_RIGHT = "Right-click: Toggle auto-sell",
 
     -- Disenchant
     DE_ENABLED = "Disenchant marking: |cFF00FF00enabled|r",
@@ -41,10 +46,25 @@ local L = {
     QUALITY_RARE = "Rare",
     QUALITY_EPIC = "Epic",
 
+    -- Expansion names
+    EXP_CLASSIC = "Classic",
+    EXP_BC = "The Burning Crusade",
+    EXP_WRATH = "Wrath of the Lich King",
+    EXP_CATA = "Cataclysm",
+    EXP_MOP = "Mists of Pandaria",
+    EXP_WOD = "Warlords of Draenor",
+    EXP_LEGION = "Legion",
+    EXP_BFA = "Battle for Azeroth",
+    EXP_SL = "Shadowlands",
+    EXP_DF = "Dragonflight",
+    EXP_TWW = "The War Within",
+    EXP_MIDNIGHT = "Midnight",
+
     -- UI
     SETTINGS_TITLE = "PocketKondo - The KonMari Method for Your Bags",
     SECTION_AUTOSELL = "Auto-Sell (Tidying Up)",
     SECTION_DISENCHANT = "Disenchant Marking (Transform)",
+    SECTION_EXPANSIONS = "Expansion Filter (Sell All Items From)",
     SECTION_LISTS = "Joy Lists",
     ENABLE_AUTOSELL = "Enable auto-sell at vendor",
     SELL_POOR_LABEL = "Sell Poor (grey) items - no joy here",
@@ -52,6 +72,8 @@ local L = {
     SELL_UNCOMMON_LABEL = "Sell Uncommon (green) items",
     SELL_BELOW_ILVL_LABEL = "Sell gear below item level (0 = off)",
     PROTECT_UNBOUND_LABEL = "Protect non-soulbound gear (tradeable items safe!)",
+    CONFIRM_SELL_LABEL = "Confirm before selling",
+    EXPANSION_HELP = "Check expansions to sell all their items at vendor.",
     ENABLE_DE = "Enable disenchant marking",
     DE_MIN_QUALITY_LABEL = "Minimum quality to mark",
     DE_MAX_QUALITY_LABEL = "Maximum quality to mark",
@@ -95,6 +117,11 @@ if GetLocale() == "deDE" then
     L.SELL_BELOW_ILVL = "Ausruestung unter Gegenstandsstufe verkaufen: "
     L.SOLD_SUMMARY = "Aufgeraeumt! %d freudlose(n) Gegenstand/Gegenstaende fuer %s verkauft."
     L.SOLD_NOTHING = "Deine Taschen machen bereits Freude!"
+    L.CONFIRM_SELL_HEADER = "%d Gegenstand/Gegenstaende fuer %s verkaufen?"
+    L.CONFIRM_SELL_BTN = "Verkaufen"
+    L.CONFIRM_TOTAL = "Gesamt"
+    L.MINIMAP_TOOLTIP_LEFT = "Linksklick: Einstellungen oeffnen"
+    L.MINIMAP_TOOLTIP_RIGHT = "Rechtsklick: Auto-Verkauf umschalten"
 
     L.DE_ENABLED = "Entzauber-Markierung: |cFF00FF00aktiviert|r"
     L.DE_DISABLED = "Entzauber-Markierung: |cFFFF0000deaktiviert|r"
@@ -119,6 +146,7 @@ if GetLocale() == "deDE" then
     L.SETTINGS_TITLE = "PocketKondo - Die KonMari-Methode fuer deine Taschen"
     L.SECTION_AUTOSELL = "Auto-Verkauf (Aufraeumen)"
     L.SECTION_DISENCHANT = "Entzauber-Markierung (Verwandeln)"
+    L.SECTION_EXPANSIONS = "Erweiterungsfilter (Alle Items verkaufen aus)"
     L.SECTION_LISTS = "Freude-Listen"
     L.ENABLE_AUTOSELL = "Auto-Verkauf beim Haendler aktivieren"
     L.SELL_POOR_LABEL = "Schlechte (graue) Gegenstaende verkaufen - keine Freude"
@@ -126,6 +154,8 @@ if GetLocale() == "deDE" then
     L.SELL_UNCOMMON_LABEL = "Ungewoehnliche (gruene) Gegenstaende verkaufen"
     L.SELL_BELOW_ILVL_LABEL = "Ausruestung unter Gegenstandsstufe verkaufen (0 = aus)"
     L.PROTECT_UNBOUND_LABEL = "Nicht-seelengebundene Ausruestung schuetzen (handelbare Items sicher!)"
+    L.CONFIRM_SELL_LABEL = "Vor dem Verkaufen bestaetigen"
+    L.EXPANSION_HELP = "Erweiterungen ankreuzen, um alle deren Items beim Haendler zu verkaufen."
     L.ENABLE_DE = "Entzauber-Markierung aktivieren"
     L.DE_MIN_QUALITY_LABEL = "Mindestqualitaet zum Markieren"
     L.DE_MAX_QUALITY_LABEL = "Hoechstqualitaet zum Markieren"

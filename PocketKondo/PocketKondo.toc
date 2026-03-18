@@ -3,7 +3,8 @@
 ## Notes: Does this loot spark joy? Auto-sell junk, mark items for disenchanting - the KonMari method for your bags.
 ## Notes-deDE: Macht dieser Loot Freude? Automatisch Schrott verkaufen und Items zum Entzaubern markieren - die KonMari-Methode fuer deine Taschen.
 ## Author: MatthiasHertel80
-## Version: 1.0.0
+## Version: 1.1.0
+## IconTexture: Interface\Icons\INV_Enchant_Disenchant
 ## SavedVariables: PocketKondoDB
 
 Core.lua
@@ -11,4 +12,5 @@ Locales.lua
 Rules.lua
 AutoSell.lua
 Disenchant.lua
+MinimapButton.lua
 UI.lua

@@ -7,6 +7,14 @@ local function GetL()
     return L
 end
 
+-- Expansion IDs and their display order
+local EXPANSION_ORDER = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }
+local EXPANSION_KEYS = {
+    [0] = "EXP_CLASSIC", [1] = "EXP_BC", [2] = "EXP_WRATH", [3] = "EXP_CATA",
+    [4] = "EXP_MOP", [5] = "EXP_WOD", [6] = "EXP_LEGION", [7] = "EXP_BFA",
+    [8] = "EXP_SL", [9] = "EXP_DF", [10] = "EXP_TWW", [11] = "EXP_MIDNIGHT",
+}
+
 -- Register slash commands
 function UI:RegisterSlashCommands()
     SLASH_POCKETKONDO1 = "/pocketkondo"
@@ -162,9 +170,9 @@ end
 function UI:CreateOptionsPanel()
     local L = GetL()
 
-    -- Midnight-compatible: BackdropTemplate + ApplyBackdrop (SetBackdrop removed in 9.0)
+    -- Midnight-compatible: BackdropTemplate + ApplyBackdrop
     optionsFrame = CreateFrame("Frame", "PocketKondoOptionsFrame", UIParent, "BackdropTemplate")
-    optionsFrame:SetSize(400, 550)
+    optionsFrame:SetSize(420, 580)
     optionsFrame:SetPoint("CENTER")
     optionsFrame:SetMovable(true)
     optionsFrame:EnableMouse(true)
@@ -190,65 +198,112 @@ function UI:CreateOptionsPanel()
     local closeBtn = CreateFrame("Button", nil, optionsFrame, "UIPanelCloseButton")
     closeBtn:SetPoint("TOPRIGHT", -5, -5)
 
-    -- Content area
-    local yOffset = -50
-    local xLeft = 20
+    -- Scroll frame for content
+    local scrollFrame = CreateFrame("ScrollFrame", "PocketKondoOptionsScrollFrame", optionsFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", 12, -45)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -34, 12)
+
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetWidth(scrollFrame:GetWidth() - 10)
+    scrollChild:SetHeight(1) -- dynamically set later
+    scrollFrame:SetScrollChild(scrollChild)
+    optionsFrame.scrollChild = scrollChild
+
+    -- Build content inside scrollChild
+    local yOffset = 0
+    local xLeft = 8
 
     -- === Auto-Sell Section ===
-    local sellHeader = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    sellHeader:SetPoint("TOPLEFT", xLeft, yOffset)
+    local sellHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    sellHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
     sellHeader:SetText("|cFFFFD100" .. L.SECTION_AUTOSELL .. "|r")
-    yOffset = yOffset - 25
+    yOffset = yOffset + 22
 
-    optionsFrame.cbAutoSell = self:CreateCheckbox(optionsFrame, xLeft, yOffset, L.ENABLE_AUTOSELL, "autoSellEnabled")
-    yOffset = yOffset - 25
-    optionsFrame.cbSellPoor = self:CreateCheckbox(optionsFrame, xLeft + 20, yOffset, L.SELL_POOR_LABEL, "sellPoor")
-    yOffset = yOffset - 25
-    optionsFrame.cbSellCommon = self:CreateCheckbox(optionsFrame, xLeft + 20, yOffset, L.SELL_COMMON_LABEL, "sellCommon")
-    yOffset = yOffset - 25
-    optionsFrame.cbSellUncommon = self:CreateCheckbox(optionsFrame, xLeft + 20, yOffset, L.SELL_UNCOMMON_LABEL, "sellUncommon")
-    yOffset = yOffset - 35
+    optionsFrame.cbAutoSell = self:CreateCheckbox(scrollChild, xLeft, -yOffset, L.ENABLE_AUTOSELL, "autoSellEnabled")
+    yOffset = yOffset + 25
+    optionsFrame.cbSellPoor = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_POOR_LABEL, "sellPoor")
+    yOffset = yOffset + 25
+    optionsFrame.cbSellCommon = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_COMMON_LABEL, "sellCommon")
+    yOffset = yOffset + 25
+    optionsFrame.cbSellUncommon = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_UNCOMMON_LABEL, "sellUncommon")
+    yOffset = yOffset + 32
 
-    optionsFrame.sliderSellIlvl = self:CreateSlider(optionsFrame, xLeft + 20, yOffset, L.SELL_BELOW_ILVL_LABEL, "sellBelowIlvl", 0, 500, 5)
-    yOffset = yOffset - 45
-    optionsFrame.cbProtectUnbound = self:CreateCheckbox(optionsFrame, xLeft + 20, yOffset, L.PROTECT_UNBOUND_LABEL, "protectUnbound")
-    yOffset = yOffset - 30
+    optionsFrame.sliderSellIlvl = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.SELL_BELOW_ILVL_LABEL, "sellBelowIlvl", 0, 500, 5)
+    yOffset = yOffset + 45
+    optionsFrame.cbProtectUnbound = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.PROTECT_UNBOUND_LABEL, "protectUnbound")
+    yOffset = yOffset + 25
+    optionsFrame.cbConfirmSell = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.CONFIRM_SELL_LABEL, "confirmBeforeSell")
+    yOffset = yOffset + 30
 
     -- === Disenchant Section ===
-    local deHeader = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    deHeader:SetPoint("TOPLEFT", xLeft, yOffset)
+    local deHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    deHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
     deHeader:SetText("|cFFFFD100" .. L.SECTION_DISENCHANT .. "|r")
-    yOffset = yOffset - 25
+    yOffset = yOffset + 22
 
-    optionsFrame.cbDE = self:CreateCheckbox(optionsFrame, xLeft, yOffset, L.ENABLE_DE, "deMarkEnabled")
-    yOffset = yOffset - 35
+    optionsFrame.cbDE = self:CreateCheckbox(scrollChild, xLeft, -yOffset, L.ENABLE_DE, "deMarkEnabled")
+    yOffset = yOffset + 32
 
-    optionsFrame.sliderDEMin = self:CreateSlider(optionsFrame, xLeft + 20, yOffset, L.DE_MIN_QUALITY_LABEL, "deMinQuality", 2, 4, 1)
-    yOffset = yOffset - 45
-    optionsFrame.sliderDEMax = self:CreateSlider(optionsFrame, xLeft + 20, yOffset, L.DE_MAX_QUALITY_LABEL, "deMaxQuality", 2, 4, 1)
-    yOffset = yOffset - 45
-    optionsFrame.sliderDEIlvl = self:CreateSlider(optionsFrame, xLeft + 20, yOffset, L.DE_BELOW_ILVL_LABEL, "deBelowIlvl", 0, 500, 5)
-    yOffset = yOffset - 50
+    optionsFrame.sliderDEMin = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_MIN_QUALITY_LABEL, "deMinQuality", 2, 4, 1)
+    yOffset = yOffset + 45
+    optionsFrame.sliderDEMax = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_MAX_QUALITY_LABEL, "deMaxQuality", 2, 4, 1)
+    yOffset = yOffset + 45
+    optionsFrame.sliderDEIlvl = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_BELOW_ILVL_LABEL, "deBelowIlvl", 0, 500, 5)
+    yOffset = yOffset + 50
+
+    -- === Expansion Filter Section ===
+    local expHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    expHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
+    expHeader:SetText("|cFFFFD100" .. L.SECTION_EXPANSIONS .. "|r")
+    yOffset = yOffset + 18
+
+    local expHelp = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    expHelp:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
+    expHelp:SetWidth(340)
+    expHelp:SetJustifyH("LEFT")
+    expHelp:SetText(L.EXPANSION_HELP)
+    yOffset = yOffset + 22
+
+    optionsFrame.expCheckboxes = {}
+    for _, expID in ipairs(EXPANSION_ORDER) do
+        local locKey = EXPANSION_KEYS[expID]
+        local cb = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L[locKey], nil)
+        -- Custom OnClick for expansion checkboxes (table-based key)
+        cb:SetScript("OnClick", function(self)
+            if self:GetChecked() then
+                ns.db.sellExpansions[expID] = true
+            else
+                ns.db.sellExpansions[expID] = nil
+            end
+        end)
+        optionsFrame.expCheckboxes[expID] = cb
+        yOffset = yOffset + 22
+    end
+    yOffset = yOffset + 10
 
     -- === Lists Section ===
-    local listHeader = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    listHeader:SetPoint("TOPLEFT", xLeft, yOffset)
+    local listHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    listHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
     listHeader:SetText("|cFFFFD100" .. L.SECTION_LISTS .. "|r")
-    yOffset = yOffset - 20
+    yOffset = yOffset + 20
 
-    optionsFrame.keepCountText = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    optionsFrame.keepCountText:SetPoint("TOPLEFT", xLeft + 10, yOffset)
-    yOffset = yOffset - 15
+    optionsFrame.keepCountText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    optionsFrame.keepCountText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
+    yOffset = yOffset + 15
 
-    optionsFrame.sellCountText = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    optionsFrame.sellCountText:SetPoint("TOPLEFT", xLeft + 10, yOffset)
-    yOffset = yOffset - 20
+    optionsFrame.sellCountText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    optionsFrame.sellCountText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
+    yOffset = yOffset + 20
 
-    local helpText = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    helpText:SetPoint("TOPLEFT", xLeft + 10, yOffset)
+    local helpText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    helpText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
     helpText:SetWidth(340)
     helpText:SetJustifyH("LEFT")
     helpText:SetText(L.LIST_HELP)
+    yOffset = yOffset + 30
+
+    -- Set scroll child height to total content height
+    scrollChild:SetHeight(yOffset)
 
     -- ESC to close
     table.insert(UISpecialFrames, "PocketKondoOptionsFrame")
@@ -266,10 +321,16 @@ function UI:RefreshOptionsPanel()
     optionsFrame.cbSellUncommon:SetChecked(db.sellUncommon)
     optionsFrame.sliderSellIlvl:SetValue(db.sellBelowIlvl)
     optionsFrame.cbProtectUnbound:SetChecked(db.protectUnbound)
+    optionsFrame.cbConfirmSell:SetChecked(db.confirmBeforeSell)
     optionsFrame.cbDE:SetChecked(db.deMarkEnabled)
     optionsFrame.sliderDEMin:SetValue(db.deMinQuality)
     optionsFrame.sliderDEMax:SetValue(db.deMaxQuality)
     optionsFrame.sliderDEIlvl:SetValue(db.deBelowIlvl)
+
+    -- Expansion checkboxes
+    for expID, cb in pairs(optionsFrame.expCheckboxes) do
+        cb:SetChecked(db.sellExpansions[expID] or false)
+    end
 
     local keepCount = 0
     for _ in pairs(db.keepList) do keepCount = keepCount + 1 end
@@ -285,21 +346,32 @@ end
 -- ========================================
 
 function UI:CreateCheckbox(parent, x, y, label, dbKey)
-    local cb = CreateFrame("CheckButton", nil, parent, "InterfaceOptionsCheckButtonTemplate")
+    local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
     cb:SetPoint("TOPLEFT", x, y)
-    cb.Text:SetText(label)
-    cb.Text:SetFontObject("GameFontHighlight")
+    cb:SetSize(26, 26)
 
-    cb:SetScript("OnClick", function(self)
-        ns.db[dbKey] = self:GetChecked()
-        if dbKey == "deMarkEnabled" then
-            if ns.db.deMarkEnabled then
-                ns.Disenchant:UpdateOverlays()
-            else
-                ns.Disenchant:ClearAllOverlays()
+    -- UICheckButtonTemplate uses .text (lowercase)
+    local textObj = cb.text or cb.Text
+    if not textObj then
+        textObj = cb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        textObj:SetPoint("LEFT", cb, "RIGHT", 2, 0)
+        cb.text = textObj
+    end
+    textObj:SetText(label)
+    textObj:SetFontObject("GameFontHighlight")
+
+    if dbKey then
+        cb:SetScript("OnClick", function(self)
+            ns.db[dbKey] = self:GetChecked()
+            if dbKey == "deMarkEnabled" then
+                if ns.db.deMarkEnabled then
+                    ns.Disenchant:UpdateOverlays()
+                else
+                    ns.Disenchant:ClearAllOverlays()
+                end
             end
-        end
-    end)
+        end)
+    end
 
     return cb
 end

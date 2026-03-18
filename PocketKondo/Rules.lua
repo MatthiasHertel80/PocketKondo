@@ -49,6 +49,11 @@ function Rules:ShouldSell(item)
         end
     end
 
+    -- Expansion-based filter
+    if item.expacID and db.sellExpansions and db.sellExpansions[item.expacID] then
+        return true
+    end
+
     return false
 end
 

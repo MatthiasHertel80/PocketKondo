@@ -2,7 +2,7 @@ local addonName, ns = ...
 
 -- Addon namespace setup
 ns.name = addonName
-ns.version = "1.0.0"
+ns.version = "1.1.0"
 
 -- Module tables
 ns.Rules = {}
@@ -19,6 +19,8 @@ ns.defaults = {
     sellBelowIlvl = 0,        -- 0 = disabled
     sellDelay = 0.2,           -- seconds between sells
     protectUnbound = true,     -- protect non-soulbound equipment from being sold
+    confirmBeforeSell = false, -- show confirm dialog before selling
+    sellExpansions = {},       -- { [expacID] = true } sell items from these expansions
     keepList = {},             -- { [itemID] = itemName }
     sellList = {},             -- { [itemID] = itemName }
     deMarkEnabled = true,
@@ -69,21 +71,40 @@ function ns:GetItemDetails(bag, slot)
         hasNoValue = info.hasNoValue,
     }
 
-    local itemName, _, _, itemLevel, _, itemType, itemSubType, _, equipLoc, _, sellPrice, classID, subclassID = C_Item.GetItemInfo(info.itemID)
+    -- Use GetItemInfoInstant for classID (always available, no cache needed)
+    local itemID_instant, itemType_instant, itemSubType_instant, equipLoc_instant, icon_instant, classID_instant, subclassID_instant = C_Item.GetItemInfoInstant(info.itemID)
+    if itemID_instant then
+        details.classID = classID_instant
+        details.subclassID = subclassID_instant
+        details.equipLoc = equipLoc_instant
+    end
+
+    -- Use GetItemInfo for name, sell price and other cached data
+    local itemName, _, _, itemLevel, _, itemType, itemSubType, _, equipLoc, _, sellPrice, classID, subclassID, _, expacID = C_Item.GetItemInfo(info.itemID)
     if itemName then
         details.name = itemName
-        details.itemLevel = itemLevel
         details.itemType = itemType
         details.itemSubType = itemSubType
-        details.equipLoc = equipLoc
         details.sellPrice = sellPrice or 0
-        details.classID = classID
-        details.subclassID = subclassID
+        details.expacID = expacID
+        -- Fallback: override with GetItemInfo values if GetItemInfoInstant missed them
+        details.classID = details.classID or classID
+        details.subclassID = details.subclassID or subclassID
+        details.equipLoc = details.equipLoc or equipLoc
+    end
+
+    -- Get reliable item level via ItemLocation (works for upgraded/modified gear)
+    local itemLocation = ItemLocation:CreateFromBagAndSlot(bag, slot)
+    if itemLocation and C_Item.DoesItemExist(itemLocation) then
+        local currentIlvl = C_Item.GetCurrentItemLevel(itemLocation)
+        details.itemLevel = currentIlvl or itemLevel
+    else
+        details.itemLevel = itemLevel
     end
 
     -- Check soulbound status via C_TooltipInfo
     details.isBound = false
-    local isEquipment = classID and (classID == 2 or classID == 4)
+    local isEquipment = details.classID and (details.classID == 2 or details.classID == 4)
     if isEquipment then
         local tooltipData = C_TooltipInfo.GetBagItem(bag, slot)
         if tooltipData and tooltipData.lines then
@@ -136,6 +157,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
             self:UnregisterEvent("ADDON_LOADED")
         end
     elseif event == "PLAYER_LOGIN" then
+        ns:InitMinimapButton()
         ns:Print(ns.L["LOADED"])
         ns.Disenchant:UpdateOverlays()
     elseif event == "MERCHANT_SHOW" then
