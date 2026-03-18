@@ -51,6 +51,7 @@ local L = {
     SELL_COMMON_LABEL = "Sell Common (white) items",
     SELL_UNCOMMON_LABEL = "Sell Uncommon (green) items",
     SELL_BELOW_ILVL_LABEL = "Sell gear below item level (0 = off)",
+    PROTECT_UNBOUND_LABEL = "Protect non-soulbound gear (tradeable items safe!)",
     ENABLE_DE = "Enable disenchant marking",
     DE_MIN_QUALITY_LABEL = "Minimum quality to mark",
     DE_MAX_QUALITY_LABEL = "Maximum quality to mark",
@@ -124,6 +125,7 @@ if GetLocale() == "deDE" then
     L.SELL_COMMON_LABEL = "Gewoehnliche (weisse) Gegenstaende verkaufen"
     L.SELL_UNCOMMON_LABEL = "Ungewoehnliche (gruene) Gegenstaende verkaufen"
     L.SELL_BELOW_ILVL_LABEL = "Ausruestung unter Gegenstandsstufe verkaufen (0 = aus)"
+    L.PROTECT_UNBOUND_LABEL = "Nicht-seelengebundene Ausruestung schuetzen (handelbare Items sicher!)"
     L.ENABLE_DE = "Entzauber-Markierung aktivieren"
     L.DE_MIN_QUALITY_LABEL = "Mindestqualitaet zum Markieren"
     L.DE_MAX_QUALITY_LABEL = "Hoechstqualitaet zum Markieren"

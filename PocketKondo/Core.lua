@@ -18,6 +18,7 @@ ns.defaults = {
     sellUncommon = false,     -- green items
     sellBelowIlvl = 0,        -- 0 = disabled
     sellDelay = 0.2,           -- seconds between sells
+    protectUnbound = true,     -- protect non-soulbound equipment from being sold
     keepList = {},             -- { [itemID] = itemName }
     sellList = {},             -- { [itemID] = itemName }
     deMarkEnabled = true,
@@ -78,6 +79,24 @@ function ns:GetItemDetails(bag, slot)
         details.sellPrice = sellPrice or 0
         details.classID = classID
         details.subclassID = subclassID
+    end
+
+    -- Check soulbound status via C_TooltipInfo
+    details.isBound = false
+    local isEquipment = classID and (classID == 2 or classID == 4)
+    if isEquipment then
+        local tooltipData = C_TooltipInfo.GetBagItem(bag, slot)
+        if tooltipData and tooltipData.lines then
+            for i = 2, math.min(#tooltipData.lines, 6) do
+                local lineText = tooltipData.lines[i] and tooltipData.lines[i].leftText
+                if lineText then
+                    if lineText == ITEM_SOULBOUND or lineText == ITEM_ACCOUNTBOUND or lineText == ITEM_BNETACCOUNTBOUND then
+                        details.isBound = true
+                        break
+                    end
+                end
+            end
+        end
     end
 
     return details

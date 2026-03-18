@@ -22,6 +22,14 @@ function Rules:ShouldSell(item)
         return false
     end
 
+    -- Protect non-soulbound equipment if enabled
+    if db.protectUnbound and item.classID then
+        local isEquipment = (item.classID == 2) or (item.classID == 4)
+        if isEquipment and not item.isBound then
+            return false
+        end
+    end
+
     -- Quality-based rules
     if db.sellPoor and item.quality == 0 then
         return true

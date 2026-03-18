@@ -164,7 +164,7 @@ function UI:CreateOptionsPanel()
 
     -- Midnight-compatible: BackdropTemplate + ApplyBackdrop (SetBackdrop removed in 9.0)
     optionsFrame = CreateFrame("Frame", "PocketKondoOptionsFrame", UIParent, "BackdropTemplate")
-    optionsFrame:SetSize(400, 520)
+    optionsFrame:SetSize(400, 550)
     optionsFrame:SetPoint("CENTER")
     optionsFrame:SetMovable(true)
     optionsFrame:EnableMouse(true)
@@ -210,7 +210,9 @@ function UI:CreateOptionsPanel()
     yOffset = yOffset - 35
 
     optionsFrame.sliderSellIlvl = self:CreateSlider(optionsFrame, xLeft + 20, yOffset, L.SELL_BELOW_ILVL_LABEL, "sellBelowIlvl", 0, 500, 5)
-    yOffset = yOffset - 50
+    yOffset = yOffset - 45
+    optionsFrame.cbProtectUnbound = self:CreateCheckbox(optionsFrame, xLeft + 20, yOffset, L.PROTECT_UNBOUND_LABEL, "protectUnbound")
+    yOffset = yOffset - 30
 
     -- === Disenchant Section ===
     local deHeader = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -263,6 +265,7 @@ function UI:RefreshOptionsPanel()
     optionsFrame.cbSellCommon:SetChecked(db.sellCommon)
     optionsFrame.cbSellUncommon:SetChecked(db.sellUncommon)
     optionsFrame.sliderSellIlvl:SetValue(db.sellBelowIlvl)
+    optionsFrame.cbProtectUnbound:SetChecked(db.protectUnbound)
     optionsFrame.cbDE:SetChecked(db.deMarkEnabled)
     optionsFrame.sliderDEMin:SetValue(db.deMinQuality)
     optionsFrame.sliderDEMax:SetValue(db.deMaxQuality)
