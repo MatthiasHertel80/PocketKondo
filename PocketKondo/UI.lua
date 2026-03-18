@@ -9,9 +9,9 @@ end
 
 -- Register slash commands
 function UI:RegisterSlashCommands()
-    SLASH_BAGCLEANER1 = "/bagcleaner"
-    SLASH_BAGCLEANER2 = "/bc"
-    SlashCmdList["BAGCLEANER"] = function(msg)
+    SLASH_POCKETKONDO1 = "/pocketkondo"
+    SLASH_POCKETKONDO2 = "/pk"
+    SlashCmdList["POCKETKONDO"] = function(msg)
         UI:HandleSlashCommand(strtrim(msg or ""))
     end
 end
@@ -162,7 +162,8 @@ end
 function UI:CreateOptionsPanel()
     local L = GetL()
 
-    optionsFrame = CreateFrame("Frame", "BagCleanerOptionsFrame", UIParent, "BackdropTemplate")
+    -- Midnight-compatible: BackdropTemplate + ApplyBackdrop (SetBackdrop removed in 9.0)
+    optionsFrame = CreateFrame("Frame", "PocketKondoOptionsFrame", UIParent, "BackdropTemplate")
     optionsFrame:SetSize(400, 520)
     optionsFrame:SetPoint("CENTER")
     optionsFrame:SetMovable(true)
@@ -172,12 +173,13 @@ function UI:CreateOptionsPanel()
     optionsFrame:SetScript("OnDragStop", optionsFrame.StopMovingOrSizing)
     optionsFrame:SetFrameStrata("DIALOG")
 
-    optionsFrame:SetBackdrop({
+    optionsFrame.backdropInfo = {
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
         tile = true, tileSize = 32, edgeSize = 32,
         insets = { left = 11, right = 12, top = 12, bottom = 11 }
-    })
+    }
+    optionsFrame:ApplyBackdrop()
 
     -- Title
     local title = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
@@ -247,7 +249,7 @@ function UI:CreateOptionsPanel()
     helpText:SetText(L.LIST_HELP)
 
     -- ESC to close
-    table.insert(UISpecialFrames, "BagCleanerOptionsFrame")
+    table.insert(UISpecialFrames, "PocketKondoOptionsFrame")
 end
 
 function UI:RefreshOptionsPanel()
@@ -331,7 +333,6 @@ function UI:CreateSlider(parent, x, y, label, dbKey, min, max, step)
         end
     end)
 
-    -- Store reference for refresh
     container.SetValue = function(self, v)
         slider:SetValue(v)
     end

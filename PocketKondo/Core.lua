@@ -28,27 +28,27 @@ ns.defaults = {
 
 -- Initialize saved variables with defaults
 function ns:InitDB()
-    if not BagCleanerDB then
-        BagCleanerDB = {}
+    if not PocketKondoDB then
+        PocketKondoDB = {}
     end
     for key, value in pairs(self.defaults) do
-        if BagCleanerDB[key] == nil then
+        if PocketKondoDB[key] == nil then
             if type(value) == "table" then
-                BagCleanerDB[key] = {}
+                PocketKondoDB[key] = {}
                 for k, v in pairs(value) do
-                    BagCleanerDB[key][k] = v
+                    PocketKondoDB[key][k] = v
                 end
             else
-                BagCleanerDB[key] = value
+                PocketKondoDB[key] = value
             end
         end
     end
-    self.db = BagCleanerDB
+    self.db = PocketKondoDB
 end
 
--- Chat output with addon prefix
+-- Chat output with addon prefix (pink for that Kondo aesthetic)
 function ns:Print(msg)
-    local prefix = "|cFF00CCFF" .. self.name .. ":|r "
+    local prefix = "|cFFFF69B4PocketKondo:|r "
     DEFAULT_CHAT_FRAME:AddMessage(prefix .. msg)
 end
 
@@ -68,7 +68,6 @@ function ns:GetItemDetails(bag, slot)
         hasNoValue = info.hasNoValue,
     }
 
-    -- Get additional item info
     local itemName, _, _, itemLevel, _, itemType, itemSubType, _, equipLoc, _, sellPrice, classID, subclassID = C_Item.GetItemInfo(info.itemID)
     if itemName then
         details.name = itemName

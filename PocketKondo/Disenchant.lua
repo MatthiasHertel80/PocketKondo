@@ -13,7 +13,6 @@ local function OnTooltipSetItem(tooltip)
     local itemID = C_Item.GetItemInfoInstant(itemLink)
     if not itemID then return end
 
-    -- Build a minimal item details table for rule check
     local itemName, _, quality, itemLevel, _, _, _, _, _, _, _, classID, subclassID = C_Item.GetItemInfo(itemID)
     if not itemName then return end
 
@@ -32,19 +31,15 @@ local function OnTooltipSetItem(tooltip)
     end
 end
 
--- Hook the tooltip on first load
+-- Hook the tooltip on first load (Midnight: TooltipDataProcessor only, no HookScript fallback)
 local tooltipHooked = false
 function Disenchant:HookTooltip()
     if tooltipHooked then return end
     tooltipHooked = true
 
-    if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
-        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
-            OnTooltipSetItem(tooltip)
-        end)
-    else
-        GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
-    end
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
+        OnTooltipSetItem(tooltip)
+    end)
 end
 
 -- Update bag slot overlays
@@ -89,13 +84,13 @@ function Disenchant:ShowOverlay(bag, slot)
 end
 
 function Disenchant:GetBagSlotButton(bag, slot)
-    -- Try the modern container frame approach
+    -- Modern container frame approach (Midnight-compatible)
     if ContainerFrameUtil_GetItemButtonAndContainer then
         local button = ContainerFrameUtil_GetItemButtonAndContainer(bag, slot)
         if button then return button end
     end
 
-    -- Fallback: try direct frame name lookup
+    -- Fallback: direct frame name lookup
     local frameName
     if bag == 0 then
         frameName = "ContainerFrame1Item" .. slot
