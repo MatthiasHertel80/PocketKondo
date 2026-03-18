@@ -59,7 +59,7 @@ end)
 -- Click handlers
 button:SetScript("OnClick", function(self, btn)
     if btn == "LeftButton" then
-        ns.UI:ToggleOptionsPanel()
+        ns.UI:OpenSettings()
     elseif btn == "RightButton" then
         ns.db.autoSellEnabled = not ns.db.autoSellEnabled
         local L = ns.L

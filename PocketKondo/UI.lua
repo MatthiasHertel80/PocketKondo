@@ -7,7 +7,7 @@ local function GetL()
     return L
 end
 
--- Expansion IDs and their display order
+-- Expansion IDs and their locale keys
 local EXPANSION_ORDER = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }
 local EXPANSION_KEYS = {
     [0] = "EXP_CLASSIC", [1] = "EXP_BC", [2] = "EXP_WRATH", [3] = "EXP_CATA",
@@ -15,7 +15,10 @@ local EXPANSION_KEYS = {
     [8] = "EXP_SL", [9] = "EXP_DF", [10] = "EXP_TWW", [11] = "EXP_MIDNIGHT",
 }
 
--- Register slash commands
+-- ========================================
+-- Slash Commands
+-- ========================================
+
 function UI:RegisterSlashCommands()
     SLASH_POCKETKONDO1 = "/pocketkondo"
     SLASH_POCKETKONDO2 = "/pk"
@@ -24,7 +27,6 @@ function UI:RegisterSlashCommands()
     end
 end
 
--- Parse item link from chat input
 local function ParseItemLink(msg)
     local itemLink = msg:match("|c.-|H(item:%d+.-)|h.-|h|r")
     if itemLink then
@@ -42,7 +44,7 @@ function UI:HandleSlashCommand(msg)
     cmd = cmd and cmd:lower() or ""
 
     if cmd == "" then
-        self:ToggleOptionsPanel()
+        self:OpenSettings()
     elseif cmd == "status" then
         self:PrintStatus()
     elseif cmd == "sell" then
@@ -148,272 +150,115 @@ function UI:PrintHelp()
 end
 
 -- ========================================
--- Settings Panel (standalone frame)
+-- Blizzard Settings API Integration
 -- ========================================
 
-local optionsFrame = nil
+local settingsCategory = nil
 
-function UI:ToggleOptionsPanel()
-    if optionsFrame and optionsFrame:IsShown() then
-        optionsFrame:Hide()
-        return
-    end
-
-    if not optionsFrame then
-        self:CreateOptionsPanel()
-    end
-
-    self:RefreshOptionsPanel()
-    optionsFrame:Show()
-end
-
-function UI:CreateOptionsPanel()
-    local L = GetL()
-
-    -- Midnight-compatible: BackdropTemplate + ApplyBackdrop
-    optionsFrame = CreateFrame("Frame", "PocketKondoOptionsFrame", UIParent, "BackdropTemplate")
-    optionsFrame:SetSize(420, 580)
-    optionsFrame:SetPoint("CENTER")
-    optionsFrame:SetMovable(true)
-    optionsFrame:EnableMouse(true)
-    optionsFrame:RegisterForDrag("LeftButton")
-    optionsFrame:SetScript("OnDragStart", optionsFrame.StartMoving)
-    optionsFrame:SetScript("OnDragStop", optionsFrame.StopMovingOrSizing)
-    optionsFrame:SetFrameStrata("DIALOG")
-
-    optionsFrame.backdropInfo = {
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 11, right = 12, top = 12, bottom = 11 }
-    }
-    optionsFrame:ApplyBackdrop()
-
-    -- Title
-    local title = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    title:SetPoint("TOP", 0, -20)
-    title:SetText(L.SETTINGS_TITLE)
-
-    -- Close button
-    local closeBtn = CreateFrame("Button", nil, optionsFrame, "UIPanelCloseButton")
-    closeBtn:SetPoint("TOPRIGHT", -5, -5)
-
-    -- Scroll frame for content
-    local scrollFrame = CreateFrame("ScrollFrame", "PocketKondoOptionsScrollFrame", optionsFrame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", 12, -45)
-    scrollFrame:SetPoint("BOTTOMRIGHT", -34, 12)
-
-    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-    scrollChild:SetWidth(scrollFrame:GetWidth() - 10)
-    scrollChild:SetHeight(1) -- dynamically set later
-    scrollFrame:SetScrollChild(scrollChild)
-    optionsFrame.scrollChild = scrollChild
-
-    -- Build content inside scrollChild
-    local yOffset = 0
-    local xLeft = 8
-
-    -- === Auto-Sell Section ===
-    local sellHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    sellHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
-    sellHeader:SetText("|cFFFFD100" .. L.SECTION_AUTOSELL .. "|r")
-    yOffset = yOffset + 22
-
-    optionsFrame.cbAutoSell = self:CreateCheckbox(scrollChild, xLeft, -yOffset, L.ENABLE_AUTOSELL, "autoSellEnabled")
-    yOffset = yOffset + 25
-    optionsFrame.cbSellPoor = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_POOR_LABEL, "sellPoor")
-    yOffset = yOffset + 25
-    optionsFrame.cbSellCommon = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_COMMON_LABEL, "sellCommon")
-    yOffset = yOffset + 25
-    optionsFrame.cbSellUncommon = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.SELL_UNCOMMON_LABEL, "sellUncommon")
-    yOffset = yOffset + 32
-
-    optionsFrame.sliderSellIlvl = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.SELL_BELOW_ILVL_LABEL, "sellBelowIlvl", 0, 500, 5)
-    yOffset = yOffset + 45
-    optionsFrame.cbProtectUnbound = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.PROTECT_UNBOUND_LABEL, "protectUnbound")
-    yOffset = yOffset + 25
-    optionsFrame.cbConfirmSell = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L.CONFIRM_SELL_LABEL, "confirmBeforeSell")
-    yOffset = yOffset + 30
-
-    -- === Disenchant Section ===
-    local deHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    deHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
-    deHeader:SetText("|cFFFFD100" .. L.SECTION_DISENCHANT .. "|r")
-    yOffset = yOffset + 22
-
-    optionsFrame.cbDE = self:CreateCheckbox(scrollChild, xLeft, -yOffset, L.ENABLE_DE, "deMarkEnabled")
-    yOffset = yOffset + 32
-
-    optionsFrame.sliderDEMin = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_MIN_QUALITY_LABEL, "deMinQuality", 2, 4, 1)
-    yOffset = yOffset + 45
-    optionsFrame.sliderDEMax = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_MAX_QUALITY_LABEL, "deMaxQuality", 2, 4, 1)
-    yOffset = yOffset + 45
-    optionsFrame.sliderDEIlvl = self:CreateSlider(scrollChild, xLeft + 20, -yOffset, L.DE_BELOW_ILVL_LABEL, "deBelowIlvl", 0, 500, 5)
-    yOffset = yOffset + 50
-
-    -- === Expansion Filter Section ===
-    local expHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    expHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
-    expHeader:SetText("|cFFFFD100" .. L.SECTION_EXPANSIONS .. "|r")
-    yOffset = yOffset + 18
-
-    local expHelp = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    expHelp:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
-    expHelp:SetWidth(340)
-    expHelp:SetJustifyH("LEFT")
-    expHelp:SetText(L.EXPANSION_HELP)
-    yOffset = yOffset + 22
-
-    optionsFrame.expCheckboxes = {}
-    for _, expID in ipairs(EXPANSION_ORDER) do
-        local locKey = EXPANSION_KEYS[expID]
-        local cb = self:CreateCheckbox(scrollChild, xLeft + 20, -yOffset, L[locKey], nil)
-        -- Custom OnClick for expansion checkboxes (table-based key)
-        cb:SetScript("OnClick", function(self)
-            if self:GetChecked() then
-                ns.db.sellExpansions[expID] = true
-            else
-                ns.db.sellExpansions[expID] = nil
-            end
-        end)
-        optionsFrame.expCheckboxes[expID] = cb
-        yOffset = yOffset + 22
-    end
-    yOffset = yOffset + 10
-
-    -- === Lists Section ===
-    local listHeader = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    listHeader:SetPoint("TOPLEFT", xLeft, -yOffset)
-    listHeader:SetText("|cFFFFD100" .. L.SECTION_LISTS .. "|r")
-    yOffset = yOffset + 20
-
-    optionsFrame.keepCountText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    optionsFrame.keepCountText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
-    yOffset = yOffset + 15
-
-    optionsFrame.sellCountText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    optionsFrame.sellCountText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
-    yOffset = yOffset + 20
-
-    local helpText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    helpText:SetPoint("TOPLEFT", xLeft + 10, -yOffset)
-    helpText:SetWidth(340)
-    helpText:SetJustifyH("LEFT")
-    helpText:SetText(L.LIST_HELP)
-    yOffset = yOffset + 30
-
-    -- Set scroll child height to total content height
-    scrollChild:SetHeight(yOffset)
-
-    -- ESC to close
-    table.insert(UISpecialFrames, "PocketKondoOptionsFrame")
-end
-
-function UI:RefreshOptionsPanel()
-    if not optionsFrame then return end
-
-    local L = GetL()
-    local db = ns.db
-
-    optionsFrame.cbAutoSell:SetChecked(db.autoSellEnabled)
-    optionsFrame.cbSellPoor:SetChecked(db.sellPoor)
-    optionsFrame.cbSellCommon:SetChecked(db.sellCommon)
-    optionsFrame.cbSellUncommon:SetChecked(db.sellUncommon)
-    optionsFrame.sliderSellIlvl:SetValue(db.sellBelowIlvl)
-    optionsFrame.cbProtectUnbound:SetChecked(db.protectUnbound)
-    optionsFrame.cbConfirmSell:SetChecked(db.confirmBeforeSell)
-    optionsFrame.cbDE:SetChecked(db.deMarkEnabled)
-    optionsFrame.sliderDEMin:SetValue(db.deMinQuality)
-    optionsFrame.sliderDEMax:SetValue(db.deMaxQuality)
-    optionsFrame.sliderDEIlvl:SetValue(db.deBelowIlvl)
-
-    -- Expansion checkboxes
-    for expID, cb in pairs(optionsFrame.expCheckboxes) do
-        cb:SetChecked(db.sellExpansions[expID] or false)
-    end
-
-    local keepCount = 0
-    for _ in pairs(db.keepList) do keepCount = keepCount + 1 end
-    local sellCount = 0
-    for _ in pairs(db.sellList) do sellCount = sellCount + 1 end
-
-    optionsFrame.keepCountText:SetText(string.format(L.KEEP_LIST_COUNT, keepCount))
-    optionsFrame.sellCountText:SetText(string.format(L.SELL_LIST_COUNT, sellCount))
-end
-
--- ========================================
--- UI Element Helpers
--- ========================================
-
-function UI:CreateCheckbox(parent, x, y, label, dbKey)
-    local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    cb:SetPoint("TOPLEFT", x, y)
-    cb:SetSize(26, 26)
-
-    -- UICheckButtonTemplate uses .text (lowercase)
-    local textObj = cb.text or cb.Text
-    if not textObj then
-        textObj = cb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        textObj:SetPoint("LEFT", cb, "RIGHT", 2, 0)
-        cb.text = textObj
-    end
-    textObj:SetText(label)
-    textObj:SetFontObject("GameFontHighlight")
-
-    if dbKey then
-        cb:SetScript("OnClick", function(self)
-            ns.db[dbKey] = self:GetChecked()
+-- Helper: register a checkbox setting backed by ns.db
+local function AddCheckbox(category, dbKey, name, tooltip, defaultVal)
+    local setting = Settings.RegisterProxySetting(category, "PocketKondo_" .. dbKey, type(defaultVal), name,
+        defaultVal,
+        function() return ns.db[dbKey] end,
+        function(value)
+            ns.db[dbKey] = value
+            -- Side effects
             if dbKey == "deMarkEnabled" then
-                if ns.db.deMarkEnabled then
+                if value then
                     ns.Disenchant:UpdateOverlays()
                 else
                     ns.Disenchant:ClearAllOverlays()
                 end
             end
-        end)
-    end
-
-    return cb
+        end
+    )
+    Settings.CreateCheckbox(category, setting, tooltip)
+    return setting
 end
 
-function UI:CreateSlider(parent, x, y, label, dbKey, min, max, step)
-    local container = CreateFrame("Frame", nil, parent)
-    container:SetSize(320, 40)
-    container:SetPoint("TOPLEFT", x, y)
-
-    local text = container:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    text:SetPoint("TOPLEFT", 0, 0)
-    text:SetText(label)
-
-    local slider = CreateFrame("Slider", nil, container, "OptionsSliderTemplate")
-    slider:SetPoint("TOPLEFT", 0, -18)
-    slider:SetSize(280, 17)
-    slider:SetMinMaxValues(min, max)
-    slider:SetValueStep(step)
-    slider:SetObeyStepOnDrag(true)
-
-    slider.Low:SetText(tostring(min))
-    slider.High:SetText(tostring(max))
-
-    local valueText = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    valueText:SetPoint("TOP", slider, "BOTTOM", 0, -2)
-
-    slider:SetScript("OnValueChanged", function(self, value)
-        value = math.floor(value / step + 0.5) * step
-        ns.db[dbKey] = value
-        if dbKey == "deMinQuality" or dbKey == "deMaxQuality" then
-            valueText:SetText(ns:GetQualityName(value))
-        else
-            valueText:SetText(tostring(value))
+-- Helper: register a slider setting backed by ns.db
+local function AddSlider(category, dbKey, name, tooltip, defaultVal, minVal, maxVal, step)
+    local setting = Settings.RegisterProxySetting(category, "PocketKondo_" .. dbKey, type(defaultVal), name,
+        defaultVal,
+        function() return ns.db[dbKey] end,
+        function(value)
+            ns.db[dbKey] = value
         end
-    end)
+    )
+    local options = Settings.CreateSliderOptions(minVal, maxVal, step)
+    options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right)
+    Settings.CreateSlider(category, setting, options, tooltip)
+    return setting
+end
 
-    container.SetValue = function(self, v)
-        slider:SetValue(v)
-    end
-    container.GetValue = function(self)
-        return slider:GetValue()
+-- Helper: register a dropdown setting backed by ns.db
+local function AddDropdown(category, dbKey, name, tooltip, defaultVal, optionsFunc)
+    local setting = Settings.RegisterProxySetting(category, "PocketKondo_" .. dbKey, type(defaultVal), name,
+        defaultVal,
+        function() return ns.db[dbKey] end,
+        function(value) ns.db[dbKey] = value end
+    )
+    Settings.CreateDropdown(category, setting, optionsFunc, tooltip)
+    return setting
+end
+
+function UI:RegisterSettingsPanel()
+    local L = GetL()
+
+    local category = Settings.RegisterVerticalLayoutCategory("PocketKondo")
+
+    -- ============ Auto-Sell Section ============
+    local autoSellLayout = category:CreateLayout()
+
+    AddCheckbox(category, "autoSellEnabled", L.ENABLE_AUTOSELL, L.TOOLTIP_AUTOSELL, true)
+    AddCheckbox(category, "sellPoor", L.SELL_POOR_LABEL, L.TOOLTIP_SELL_POOR, true)
+    AddCheckbox(category, "sellCommon", L.SELL_COMMON_LABEL, L.TOOLTIP_SELL_COMMON, false)
+    AddCheckbox(category, "sellUncommon", L.SELL_UNCOMMON_LABEL, L.TOOLTIP_SELL_UNCOMMON, false)
+    AddSlider(category, "sellBelowIlvl", L.SELL_BELOW_ILVL_LABEL, L.TOOLTIP_SELL_ILVL, 0, 0, 500, 5)
+    AddCheckbox(category, "protectUnbound", L.PROTECT_UNBOUND_LABEL, L.TOOLTIP_PROTECT_UNBOUND, true)
+    AddCheckbox(category, "confirmBeforeSell", L.CONFIRM_SELL_LABEL, L.TOOLTIP_CONFIRM_SELL, false)
+
+    -- ============ Disenchant Section ============
+    AddCheckbox(category, "deMarkEnabled", L.ENABLE_DE, L.TOOLTIP_DE, true)
+
+    local function QualityOptions()
+        local container = Settings.CreateControlTextContainer()
+        container:Add(2, L.QUALITY_UNCOMMON)
+        container:Add(3, L.QUALITY_RARE)
+        container:Add(4, L.QUALITY_EPIC)
+        return container:GetData()
     end
 
-    return container
+    AddDropdown(category, "deMinQuality", L.DE_MIN_QUALITY_LABEL, L.TOOLTIP_DE_MIN, 2, QualityOptions)
+    AddDropdown(category, "deMaxQuality", L.DE_MAX_QUALITY_LABEL, L.TOOLTIP_DE_MAX, 2, QualityOptions)
+    AddSlider(category, "deBelowIlvl", L.DE_BELOW_ILVL_LABEL, L.TOOLTIP_DE_ILVL, 0, 0, 500, 5)
+
+    -- ============ Expansion Filter Section ============
+    for _, expID in ipairs(EXPANSION_ORDER) do
+        local locKey = EXPANSION_KEYS[expID]
+        local dbKey = "sellExp_" .. expID
+
+        local setting = Settings.RegisterProxySetting(category, "PocketKondo_sellExp_" .. expID, "boolean",
+            L[locKey],
+            false,
+            function() return ns.db.sellExpansions[expID] or false end,
+            function(value)
+                if value then
+                    ns.db.sellExpansions[expID] = true
+                else
+                    ns.db.sellExpansions[expID] = nil
+                end
+            end
+        )
+        Settings.CreateCheckbox(category, setting, string.format(L.TOOLTIP_EXPANSION, L[locKey]))
+    end
+
+    Settings.RegisterAddOnCategory(category)
+    settingsCategory = category
+end
+
+function UI:OpenSettings()
+    if settingsCategory then
+        Settings.OpenToCategory(settingsCategory:GetID())
+    end
 end

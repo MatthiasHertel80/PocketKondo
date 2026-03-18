@@ -60,18 +60,18 @@ local L = {
     EXP_TWW = "The War Within",
     EXP_MIDNIGHT = "Midnight",
 
-    -- UI
+    -- UI Labels
     SETTINGS_TITLE = "PocketKondo - The KonMari Method for Your Bags",
     SECTION_AUTOSELL = "Auto-Sell (Tidying Up)",
     SECTION_DISENCHANT = "Disenchant Marking (Transform)",
     SECTION_EXPANSIONS = "Expansion Filter (Sell All Items From)",
     SECTION_LISTS = "Joy Lists",
     ENABLE_AUTOSELL = "Enable auto-sell at vendor",
-    SELL_POOR_LABEL = "Sell Poor (grey) items - no joy here",
+    SELL_POOR_LABEL = "Sell Poor (grey) items",
     SELL_COMMON_LABEL = "Sell Common (white) items",
     SELL_UNCOMMON_LABEL = "Sell Uncommon (green) items",
     SELL_BELOW_ILVL_LABEL = "Sell gear below item level (0 = off)",
-    PROTECT_UNBOUND_LABEL = "Protect non-soulbound gear (tradeable items safe!)",
+    PROTECT_UNBOUND_LABEL = "Protect non-soulbound gear",
     CONFIRM_SELL_LABEL = "Confirm before selling",
     EXPANSION_HELP = "Check expansions to sell all their items at vendor.",
     ENABLE_DE = "Enable disenchant marking",
@@ -81,6 +81,20 @@ local L = {
     KEEP_LIST_COUNT = "Sparks Joy: %d item(s)",
     SELL_LIST_COUNT = "Does Not Spark Joy: %d item(s)",
     LIST_HELP = "Use /pk keep <itemlink> and /pk sell-add <itemlink> to manage lists.",
+
+    -- Tooltips for Settings panel
+    TOOLTIP_AUTOSELL = "Automatically sell items matching your rules when visiting a vendor.",
+    TOOLTIP_SELL_POOR = "Sell grey quality items - no joy here!",
+    TOOLTIP_SELL_COMMON = "Sell white quality items at the vendor.",
+    TOOLTIP_SELL_UNCOMMON = "Sell green quality items at the vendor.",
+    TOOLTIP_SELL_ILVL = "Sell equipment below this item level. Set to 0 to disable.",
+    TOOLTIP_PROTECT_UNBOUND = "Prevent selling equipment that is not soulbound. Keeps tradeable items safe from accidental sales.",
+    TOOLTIP_CONFIRM_SELL = "Show a confirmation dialog listing all items before selling.",
+    TOOLTIP_DE = "Mark items in your bags for disenchanting with a visual overlay.",
+    TOOLTIP_DE_MIN = "Minimum item quality to mark for disenchanting.",
+    TOOLTIP_DE_MAX = "Maximum item quality to mark for disenchanting.",
+    TOOLTIP_DE_ILVL = "Only mark equipment below this item level. Set to 0 to disable.",
+    TOOLTIP_EXPANSION = "Sell all items from %s at the vendor.",
 
     -- Slash command help
     HELP_HEADER = "--- PocketKondo Commands ---",
@@ -149,14 +163,27 @@ if GetLocale() == "deDE" then
     L.SECTION_EXPANSIONS = "Erweiterungsfilter (Alle Items verkaufen aus)"
     L.SECTION_LISTS = "Freude-Listen"
     L.ENABLE_AUTOSELL = "Auto-Verkauf beim Haendler aktivieren"
-    L.SELL_POOR_LABEL = "Schlechte (graue) Gegenstaende verkaufen - keine Freude"
+    L.SELL_POOR_LABEL = "Schlechte (graue) Gegenstaende verkaufen"
     L.SELL_COMMON_LABEL = "Gewoehnliche (weisse) Gegenstaende verkaufen"
     L.SELL_UNCOMMON_LABEL = "Ungewoehnliche (gruene) Gegenstaende verkaufen"
     L.SELL_BELOW_ILVL_LABEL = "Ausruestung unter Gegenstandsstufe verkaufen (0 = aus)"
-    L.PROTECT_UNBOUND_LABEL = "Nicht-seelengebundene Ausruestung schuetzen (handelbare Items sicher!)"
+    L.PROTECT_UNBOUND_LABEL = "Nicht-seelengebundene Ausruestung schuetzen"
     L.CONFIRM_SELL_LABEL = "Vor dem Verkaufen bestaetigen"
     L.EXPANSION_HELP = "Erweiterungen ankreuzen, um alle deren Items beim Haendler zu verkaufen."
     L.ENABLE_DE = "Entzauber-Markierung aktivieren"
+
+    L.TOOLTIP_AUTOSELL = "Automatisch Items nach deinen Regeln beim Haendler verkaufen."
+    L.TOOLTIP_SELL_POOR = "Graue Gegenstaende verkaufen - macht keine Freude!"
+    L.TOOLTIP_SELL_COMMON = "Weisse Gegenstaende beim Haendler verkaufen."
+    L.TOOLTIP_SELL_UNCOMMON = "Gruene Gegenstaende beim Haendler verkaufen."
+    L.TOOLTIP_SELL_ILVL = "Ausruestung unter dieser Gegenstandsstufe verkaufen. 0 = deaktiviert."
+    L.TOOLTIP_PROTECT_UNBOUND = "Verhindert den Verkauf von nicht-seelengebundener Ausruestung. Haelt handelbare Items sicher."
+    L.TOOLTIP_CONFIRM_SELL = "Zeigt einen Bestaetigungsdialog mit allen Items vor dem Verkauf."
+    L.TOOLTIP_DE = "Markiert Items in deinen Taschen zum Entzaubern mit einem visuellen Overlay."
+    L.TOOLTIP_DE_MIN = "Mindestqualitaet zum Markieren fuer Entzauberung."
+    L.TOOLTIP_DE_MAX = "Hoechstqualitaet zum Markieren fuer Entzauberung."
+    L.TOOLTIP_DE_ILVL = "Nur Ausruestung unter dieser Gegenstandsstufe markieren. 0 = deaktiviert."
+    L.TOOLTIP_EXPANSION = "Alle Items aus %s beim Haendler verkaufen."
     L.DE_MIN_QUALITY_LABEL = "Mindestqualitaet zum Markieren"
     L.DE_MAX_QUALITY_LABEL = "Hoechstqualitaet zum Markieren"
     L.DE_BELOW_ILVL_LABEL = "Ausruestung unter Gegenstandsstufe markieren (0 = aus)"

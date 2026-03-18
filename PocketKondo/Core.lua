@@ -157,6 +157,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
             self:UnregisterEvent("ADDON_LOADED")
         end
     elseif event == "PLAYER_LOGIN" then
+        ns.UI:RegisterSettingsPanel()
         ns:InitMinimapButton()
         ns:Print(ns.L["LOADED"])
         ns.Disenchant:UpdateOverlays()
