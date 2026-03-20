@@ -73,7 +73,7 @@ local L = {
     SELL_BELOW_ILVL_LABEL = "Sell gear below item level (0 = off)",
     PROTECT_UNBOUND_LABEL = "Protect non-soulbound gear",
     CONFIRM_SELL_LABEL = "Confirm before selling",
-    MARK_LEARNABLES_LABEL = "Mark learnable items in bags",
+    MARK_LEARNABLES_LABEL = "Mark learnable items in bags (recipes, pets, knowledge)",
     EXPANSION_HELP = "Check expansions to sell all their items at vendor.",
     ENABLE_DE = "Enable disenchant marking",
     DE_MIN_QUALITY_LABEL = "Minimum quality to mark",
@@ -91,7 +91,7 @@ local L = {
     TOOLTIP_SELL_ILVL = "Sell equipment below this item level. Set to 0 to disable.",
     TOOLTIP_PROTECT_UNBOUND = "Prevent selling equipment that is not soulbound. Keeps tradeable items safe from accidental sales.",
     TOOLTIP_CONFIRM_SELL = "Show a confirmation dialog listing all items before selling.",
-    TOOLTIP_MARK_LEARNABLES = "Show a green icon on one-time learnable items (recipes, companion pets, mounts, toys) so you can learn them and free bag space.",
+    TOOLTIP_MARK_LEARNABLES = "Show a green icon on one-time learnable items: recipes, companion pets, mounts, toys, and profession knowledge items (treatises, tomes, journals).",
     TOOLTIP_DE = "Mark items in your bags for disenchanting with a visual overlay.",
     TOOLTIP_DE_MIN = "Minimum item quality to mark for disenchanting.",
     TOOLTIP_DE_MAX = "Maximum item quality to mark for disenchanting.",
@@ -171,7 +171,7 @@ if GetLocale() == "deDE" then
     L.SELL_BELOW_ILVL_LABEL = "Ausruestung unter Gegenstandsstufe verkaufen (0 = aus)"
     L.PROTECT_UNBOUND_LABEL = "Nicht-seelengebundene Ausruestung schuetzen"
     L.CONFIRM_SELL_LABEL = "Vor dem Verkaufen bestaetigen"
-    L.MARK_LEARNABLES_LABEL = "Lernbare Items in Taschen markieren"
+    L.MARK_LEARNABLES_LABEL = "Lernbare Items markieren (Rezepte, Begleiter, Berufswissen)"
     L.EXPANSION_HELP = "Erweiterungen ankreuzen, um alle deren Items beim Haendler zu verkaufen."
     L.ENABLE_DE = "Entzauber-Markierung aktivieren"
 
@@ -182,7 +182,7 @@ if GetLocale() == "deDE" then
     L.TOOLTIP_SELL_ILVL = "Ausruestung unter dieser Gegenstandsstufe verkaufen. 0 = deaktiviert."
     L.TOOLTIP_PROTECT_UNBOUND = "Verhindert den Verkauf von nicht-seelengebundener Ausruestung. Haelt handelbare Items sicher."
     L.TOOLTIP_CONFIRM_SELL = "Zeigt einen Bestaetigungsdialog mit allen Items vor dem Verkauf."
-    L.TOOLTIP_MARK_LEARNABLES = "Zeigt ein gruenes Symbol auf einmalig lernbaren Items (Rezepte, Begleiter, Reittiere, Spielzeug), damit du sie lernen und Platz schaffen kannst."
+    L.TOOLTIP_MARK_LEARNABLES = "Zeigt ein gruenes Symbol auf einmalig lernbaren Items: Rezepte, Begleiter, Reittiere, Spielzeug und Berufs-Wissensitems (Abhandlungen, Wissenstome, Journale)."
     L.TOOLTIP_DE = "Markiert Items in deinen Taschen zum Entzaubern mit einem visuellen Overlay."
     L.TOOLTIP_DE_MIN = "Mindestqualitaet zum Markieren fuer Entzauberung."
     L.TOOLTIP_DE_MAX = "Hoechstqualitaet zum Markieren fuer Entzauberung."

@@ -124,6 +124,39 @@ function ns:GetItemDetails(bag, slot)
     return details
 end
 
+-- Learnable keywords for tooltip scanning (works for EN and DE clients)
+local LEARNABLE_PATTERNS = {
+    "teaches",           -- EN: "Use: Teaches you..."
+    "learn",             -- EN: "Use: Learn..."
+    "discover",          -- EN: "Use: Discover..."
+    "knowledge",         -- EN: "...profession knowledge"
+    "technique",         -- EN: technique items
+    "erlernt",           -- DE: "Benutzen: Erlernt..."
+    "lernt",             -- DE: "Benutzen: Lernt..."
+    "wissen",            -- DE: "...Berufswissen"
+    "entdeckt",          -- DE: "Benutzen: Entdeckt..."
+    "technik",           -- DE: Technik items
+}
+
+-- Check if a bag item has a learnable "Use:" effect via tooltip
+function ns:IsLearnableFromTooltip(bag, slot)
+    local tooltipData = C_TooltipInfo.GetBagItem(bag, slot)
+    if not tooltipData or not tooltipData.lines then return false end
+
+    for i = 2, #tooltipData.lines do
+        local lineText = tooltipData.lines[i] and tooltipData.lines[i].leftText
+        if lineText then
+            local lower = lineText:lower()
+            for _, pattern in ipairs(LEARNABLE_PATTERNS) do
+                if lower:find(pattern, 1, true) then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 -- Format copper value to gold/silver/copper string
 function ns:FormatMoney(copper)
     if not copper or copper == 0 then

@@ -129,6 +129,14 @@ function Rules:ShouldMarkUse(item)
         end
     end
 
+    -- Profession knowledge items (TWW/Midnight treatises, tomes, journals, etc.)
+    -- These are typically classID 0 (Consumable) with a "Use:" effect granting knowledge
+    if item.classID == 0 and item.bag ~= nil and item.slot ~= nil then
+        if ns:IsLearnableFromTooltip(item.bag, item.slot) then
+            return true
+        end
+    end
+
     return false
 end
 
