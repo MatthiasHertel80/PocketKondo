@@ -186,7 +186,9 @@ local function AddSlider(category, dbKey, name, tooltip, defaultVal, minVal, max
         end
     )
     local options = Settings.CreateSliderOptions(minVal, maxVal, step)
-    options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right)
+    if MinimalSliderWithSteppersMixin then
+        options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right)
+    end
     Settings.CreateSlider(category, setting, options, tooltip)
     return setting
 end
@@ -208,8 +210,6 @@ function UI:RegisterSettingsPanel()
     local category = Settings.RegisterVerticalLayoutCategory("PocketKondo")
 
     -- ============ Auto-Sell Section ============
-    local autoSellLayout = category:CreateLayout()
-
     AddCheckbox(category, "autoSellEnabled", L.ENABLE_AUTOSELL, L.TOOLTIP_AUTOSELL, true)
     AddCheckbox(category, "sellPoor", L.SELL_POOR_LABEL, L.TOOLTIP_SELL_POOR, true)
     AddCheckbox(category, "sellCommon", L.SELL_COMMON_LABEL, L.TOOLTIP_SELL_COMMON, false)
@@ -217,6 +217,9 @@ function UI:RegisterSettingsPanel()
     AddSlider(category, "sellBelowIlvl", L.SELL_BELOW_ILVL_LABEL, L.TOOLTIP_SELL_ILVL, 0, 0, 500, 5)
     AddCheckbox(category, "protectUnbound", L.PROTECT_UNBOUND_LABEL, L.TOOLTIP_PROTECT_UNBOUND, true)
     AddCheckbox(category, "confirmBeforeSell", L.CONFIRM_SELL_LABEL, L.TOOLTIP_CONFIRM_SELL, false)
+
+    -- ============ Bag Marking Section ============
+    AddCheckbox(category, "markConsumables", L.MARK_CONSUMABLES_LABEL, L.TOOLTIP_MARK_CONSUMABLES, false)
 
     -- ============ Disenchant Section ============
     AddCheckbox(category, "deMarkEnabled", L.ENABLE_DE, L.TOOLTIP_DE, true)

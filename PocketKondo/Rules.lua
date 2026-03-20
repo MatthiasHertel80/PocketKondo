@@ -90,6 +90,28 @@ function Rules:ShouldMarkDE(item)
     return true
 end
 
+-- Check if an item is a usable consumable that could be used to free space
+function Rules:ShouldMarkUse(item)
+    if not item then return false end
+
+    local db = ns.db
+    if not db.markConsumables then return false end
+
+    -- Keep list always wins
+    if db.keepList[item.itemID] then
+        return false
+    end
+
+    if not item.classID then return false end
+
+    -- Consumable (classID 0): potions, elixirs, flasks, food, bandages, scrolls, etc.
+    if item.classID == 0 then
+        return true
+    end
+
+    return false
+end
+
 -- List management
 function Rules:AddToKeepList(itemID, itemName)
     ns.db.keepList[itemID] = itemName or true

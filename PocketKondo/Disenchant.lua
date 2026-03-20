@@ -2,6 +2,7 @@ local addonName, ns = ...
 local Disenchant = ns.Disenchant
 
 Disenchant.overlays = {}
+Disenchant.useOverlays = {}
 
 -- Tooltip hook for disenchant marking
 local function OnTooltipSetItem(tooltip)
@@ -50,15 +51,23 @@ function Disenchant:UpdateOverlays()
     for _, overlay in pairs(self.overlays) do
         overlay:Hide()
     end
+    for _, overlay in pairs(self.useOverlays) do
+        overlay:Hide()
+    end
 
-    if not ns.db or not ns.db.deMarkEnabled then return end
+    if not ns.db then return end
 
     for bag = 0, 4 do
         local numSlots = C_Container.GetContainerNumSlots(bag)
         for slot = 1, numSlots do
             local item = ns:GetItemDetails(bag, slot)
-            if item and ns.Rules:ShouldMarkDE(item) then
-                self:ShowOverlay(bag, slot)
+            if item then
+                if ns.db.deMarkEnabled and ns.Rules:ShouldMarkDE(item) then
+                    self:ShowOverlay(bag, slot)
+                end
+                if ns.Rules:ShouldMarkUse(item) then
+                    self:ShowUseOverlay(bag, slot)
+                end
             end
         end
     end
@@ -101,8 +110,30 @@ function Disenchant:GetBagSlotButton(bag, slot)
     return _G[frameName]
 end
 
+function Disenchant:ShowUseOverlay(bag, slot)
+    local button = self:GetBagSlotButton(bag, slot)
+    if not button then return end
+
+    local key = bag .. ":" .. slot
+    local overlay = self.useOverlays[key]
+
+    if not overlay then
+        overlay = button:CreateTexture(nil, "OVERLAY")
+        overlay:SetSize(16, 16)
+        overlay:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
+        overlay:SetTexture(134873) -- Potion icon (INV_Potion_93)
+        overlay:SetVertexColor(0.2, 1, 0.2, 0.9) -- green tint
+        self.useOverlays[key] = overlay
+    end
+
+    overlay:Show()
+end
+
 function Disenchant:ClearAllOverlays()
     for _, overlay in pairs(self.overlays) do
+        overlay:Hide()
+    end
+    for _, overlay in pairs(self.useOverlays) do
         overlay:Hide()
     end
 end

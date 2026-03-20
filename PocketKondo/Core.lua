@@ -23,6 +23,7 @@ ns.defaults = {
     sellExpansions = {},       -- { [expacID] = true } sell items from these expansions
     keepList = {},             -- { [itemID] = itemName }
     sellList = {},             -- { [itemID] = itemName }
+    markConsumables = false,   -- mark usable consumables in bags
     deMarkEnabled = true,
     deMinQuality = 2,          -- Uncommon
     deMaxQuality = 2,          -- Uncommon
@@ -157,7 +158,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
             self:UnregisterEvent("ADDON_LOADED")
         end
     elseif event == "PLAYER_LOGIN" then
-        ns.UI:RegisterSettingsPanel()
+        local ok, err = pcall(function() ns.UI:RegisterSettingsPanel() end)
+        if not ok then ns:Print("Settings error: " .. tostring(err)) end
         ns:InitMinimapButton()
         ns:Print(ns.L["LOADED"])
         ns.Disenchant:UpdateOverlays()
