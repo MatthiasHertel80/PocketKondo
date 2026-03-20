@@ -23,7 +23,7 @@ ns.defaults = {
     sellExpansions = {},       -- { [expacID] = true } sell items from these expansions
     keepList = {},             -- { [itemID] = itemName }
     sellList = {},             -- { [itemID] = itemName }
-    markConsumables = false,   -- mark usable consumables in bags
+    markLearnables = false,    -- mark one-time learnable items (recipes, pets, mounts, toys)
     deMarkEnabled = true,
     deMinQuality = 2,          -- Uncommon
     deMaxQuality = 2,          -- Uncommon

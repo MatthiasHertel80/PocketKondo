@@ -219,7 +219,7 @@ function UI:RegisterSettingsPanel()
     AddCheckbox(category, "confirmBeforeSell", L.CONFIRM_SELL_LABEL, L.TOOLTIP_CONFIRM_SELL, false)
 
     -- ============ Bag Marking Section ============
-    AddCheckbox(category, "markConsumables", L.MARK_CONSUMABLES_LABEL, L.TOOLTIP_MARK_CONSUMABLES, false)
+    AddCheckbox(category, "markLearnables", L.MARK_LEARNABLES_LABEL, L.TOOLTIP_MARK_LEARNABLES, false)
 
     -- ============ Disenchant Section ============
     AddCheckbox(category, "deMarkEnabled", L.ENABLE_DE, L.TOOLTIP_DE, true)

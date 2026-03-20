@@ -90,12 +90,13 @@ function Rules:ShouldMarkDE(item)
     return true
 end
 
--- Check if an item is a usable consumable that could be used to free space
+-- Check if an item is a one-time learnable that could be used to free space
+-- Covers: recipes, companion pets, mounts, toys, transmog ensembles, etc.
 function Rules:ShouldMarkUse(item)
     if not item then return false end
 
     local db = ns.db
-    if not db.markConsumables then return false end
+    if not db.markLearnables then return false end
 
     -- Keep list always wins
     if db.keepList[item.itemID] then
@@ -104,9 +105,28 @@ function Rules:ShouldMarkUse(item)
 
     if not item.classID then return false end
 
-    -- Consumable (classID 0): potions, elixirs, flasks, food, bandages, scrolls, etc.
-    if item.classID == 0 then
+    -- Recipe (classID 9): plans, patterns, schematics, formulas, etc.
+    if item.classID == 9 then
         return true
+    end
+
+    -- Miscellaneous (classID 15) learnable subcategories
+    if item.classID == 15 then
+        -- subclassID 2 = Companion Pet, 5 = Mount
+        if item.subclassID == 2 or item.subclassID == 5 then
+            return true
+        end
+    end
+
+    -- Check for toys via C_ToyBox (items that teach a toy)
+    if item.itemID and C_ToyBox and C_ToyBox.GetToyInfo then
+        local toyItemID = C_ToyBox.GetToyInfo(item.itemID)
+        if toyItemID then
+            -- Only mark if not already collected
+            if not PlayerHasToy or not PlayerHasToy(item.itemID) then
+                return true
+            end
+        end
     end
 
     return false

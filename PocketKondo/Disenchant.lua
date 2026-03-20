@@ -121,8 +121,8 @@ function Disenchant:ShowUseOverlay(bag, slot)
         overlay = button:CreateTexture(nil, "OVERLAY")
         overlay:SetSize(16, 16)
         overlay:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-        overlay:SetTexture(134873) -- Potion icon (INV_Potion_93)
-        overlay:SetVertexColor(0.2, 1, 0.2, 0.9) -- green tint
+        overlay:SetTexture(134941) -- Book icon (INV_Misc_Book_09)
+        overlay:SetVertexColor(0.3, 1, 0.3, 0.9) -- green tint
         self.useOverlays[key] = overlay
     end
 
